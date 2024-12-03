@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Callback</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    #first {
+      height: 100vh;
+      width: 100vw;
+      /* background: aqua; */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .box {
+      height: 300px;
+      width: 400px;
+      box-shadow: 2px 2px 0px 5px #183153;
+      background-color: white;
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      overflow: auto;
+      padding: 30px;
+    }
+    .box:hover {
+      box-shadow: 2px 2px 0px 5px #6741d9;
+    }
+
+    #btn {
+      background: #fab005;
+      padding: 12px 50px;
+      box-shadow: 2px 2px 0px 5px #183153;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #btn:hover {
+      box-shadow: 2px 2px 0px 5px #6741d9;
+    }
+
+    .svgimg {
+      position: absolute;
+      left: -600px;
+      bottom: 0;
+    }
+
+    .svgimg1 {
+      position: absolute;
+      right: -600px;
+      bottom: 0;
+    }
+
+    @media only screen and (max-width: 1100px) {
+      .svgimg1,
+      .svgimg {
+        display: none;
+      }
+    }
+  </style>
+
+  <body>
+    <section id="first">
+      <img class="svgimg" src="svgexport-1.svg" alt="" />
+
+      <div class="box">
+        <p id="text"></p>
+      </div>
+
+      <p id="btn">Click Me</p>
+      <img class="svgimg1" src="svgexport-1.svg" alt="" />
+    </section>
+
+    <script>
+      document.getElementById("btn").addEventListener("click", fetchdata);
+
+      async function fetchdata() {
+        const textElement = document.getElementById("text");
+        textElement.textContent = "Loading..."; // Show loading message
+
+        try {
+          const data = await fetchdatawithtime(
+            "https://dummyjson.com/posts",
+            5000
+          );
+          const posts = data.posts
+            .map((post) => `<p>${post.title}</p>`)
+            .join("");
+          textElement.innerHTML = posts;
+        } catch (error) {
+          textElement.innerText = error;
+        }
+      }
+
+      async function fetchdatawithtime(url, timeout = 5000) {
+        const timeoutpromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("requst timed out")), timeout)
+        );
+        const fetchPromise = fetch(url).then((response) => {
+          if (!response.ok) {
+            throw new Error(`Http error ! status: ${response.status}`);
+          }
+
+          return response.json();
+        });
+
+        return await Promise.race([fetchPromise, timeoutpromise]);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Callback</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    #first {
+      height: 100vh;
+      width: 100vw;
+      /* background: aqua; */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .box {
+      height: 300px;
+      width: 400px;
+      box-shadow: 2px 2px 0px 5px #183153;
+      background-color: white;
+      border-radius: 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      overflow: auto;
+      padding: 30px;
+    }
+    .box:hover {
+      box-shadow: 2px 2px 0px 5px #6741d9;
+    }
+
+    #btn {
+      background: #fab005;
+      padding: 12px 50px;
+      box-shadow: 2px 2px 0px 5px #183153;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #btn:hover {
+      box-shadow: 2px 2px 0px 5px #6741d9;
+    }
+
+    .svgimg {
+      position: absolute;
+      left: -600px;
+      bottom: 0;
+    }
+
+    .svgimg1 {
+      position: absolute;
+      right: -600px;
+      bottom: 0;
+    }
+
+    @media only screen and (max-width: 1100px) {
+      .svgimg1,
+      .svgimg {
+        display: none;
+      }
+    }
+  </style>
+
+  <body>
+    <section id="first">
+      <img class="svgimg" src="svgexport-1.svg" alt="" />
+
+      <div class="box">
+        <p id="text"></p>
+      </div>
+
+      <p id="btn">Click Me</p>
+      <img class="svgimg1" src="svgexport-1.svg" alt="" />
+    </section>
+
+    <script>
+      const button = document.getElementById("btn");
+      const outputDiv = document.getElementById("text");
+
+      button.addEventListener("click", function () {
+        outputDiv.innerText = "Fetching Data...";
+
+        // Function to fetch data with a timeout
+        const fetchWithTimeout = (url, timeout) => {
+          return new Promise((resolve, reject) => {
+            const timeoutId = setTimeout(() => {
+              reject(new Error("Operation timed out"));
+            }, timeout);
+
+            fetch(url)
+              .then((response) => {
+                clearTimeout(timeoutId); // Clear timeout if data is fetched successfully
+                return response.json();
+              })
+              .then(resolve)
+              .catch(reject);
+          });
+        };
+
+        // Fetch data with a 5-second timeout
+        fetchWithTimeout("https://dummyjson.com/posts", 5000)
+          .then((data) => {
+            const posts = data.posts
+              .map((post) => `<p>${post.title}</p>`)
+              .join("");
+            outputDiv.innerHTML = posts; // Display post titles in the div
+          })
+          .catch((error) => {
+            outputDiv.innerText = error.message; // Display error message
+
+            console.error(error);
+          });
+      });
+    </script>
+  </body>
+</html>
